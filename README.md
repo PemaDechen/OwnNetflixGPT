@@ -1,0 +1,2 @@
+# OwnNetflixGPT
+Building Netflix GPT
