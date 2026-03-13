@@ -1,17 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Body from '../src/components/Body'
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div className="text-3xl text-green-400">
-      You are attracting magic in your life, have faith and trust in the process.
-      
-    </div>
-  )
+  return <Body/>
 }
 
-export default App
+export default App;
