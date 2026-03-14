@@ -1,0 +1,52 @@
+type User @table {
+  email: String!
+  passwordHash: String!
+  createdAt: Timestamp!
+  displayName: String
+}
+
+type Account @table {
+  user: User!
+  subscriptionType: SubscriptionType!
+  createdAt: Timestamp!
+  billingAddress: String
+}
+
+type Profile @table {
+  account: Account!
+  profileName: String!
+  createdAt: Timestamp!
+  avatarUrl: String
+}
+
+type Content @table {
+  title: String!
+  contentType: String!
+  releaseYear: Int!
+  createdAt: Timestamp!
+  description: String
+  genres: [String]
+  runtimeMinutes: Int
+  posterUrl: String
+}
+
+type Watchlist @table(key: ["profile", "content"]) {
+  profile: Profile!
+  content: Content!
+  addedAt: Timestamp!
+}
+
+type ViewingHistory @table(key: ["profile", "content"]) {
+  profile: Profile!
+  content: Content!
+  watchedAt: Timestamp!
+  progressSeconds: Int
+}
+
+type SubscriptionType @table {
+  planName: String!
+  monthlyPrice: Float!
+  maxProfiles: Int!
+  createdAt: Timestamp!
+  quality: String
+}
