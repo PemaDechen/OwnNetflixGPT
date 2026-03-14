@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Header } from "./Header";
+import { validate } from "../utils/validate";
 
 const Login = () => {
   const [isSignIn, setSignIn] = useState(true);
-  const handleSignUp = () => {
+  const [errorMessage, setErrorMessage] = useState("");
+  const email = useRef(null);
+  const password = useRef(null);
+  const toggleSignInForm = () => {
     setSignIn(!isSignIn);
+  };
+
+  const handleSignIn = () => {
+    console.log(password?.current?.value)
+    const isValid = validate(email?.current?.value, password?.current?.value);
+    setErrorMessage(isValid);
   };
   return (
     <div>
@@ -17,31 +27,41 @@ const Login = () => {
 
       <Header />
       <form
-        action=""
+        onSubmit={(e) => e.preventDefault()}
         className="w-3/12 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white opacity-90"
       >
         <h1 className="font-bold text-3xl py-4">
           {isSignIn ? "Sign In" : "Sign Up"}
         </h1>
-        {!isSignIn && <input
-          type="text"
-          placeholder="Full Name"
-          className="m-4 p-4 w-full bg-gray-900 text-white"
-        />}
+        {!isSignIn && (
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="m-4 p-4 w-full bg-gray-900 text-white"
+          />
+        )}
         <input
+          ref={email}
           type="text"
           placeholder="Email Address"
           className="m-4 p-4 w-full bg-gray-900 text-white"
         />
         <input
+          ref={password}
           type="password"
           placeholder="Password"
           className="m-4 p-4 w-full bg-gray-900 text-white"
         />
-        <button className="m-4 p-4 bg-red-700 w-full rounded-lg cursor-pointer">
+        {errorMessage && (
+          <p className="text-red-500 text-lg font-bold pl-4">{errorMessage}</p>
+        )}
+        <button
+          className="m-4 p-4 bg-red-700 w-full rounded-lg cursor-pointer"
+          onClick={handleSignIn}
+        >
           {isSignIn ? "Sign In" : "Sign Up"}
         </button>
-        <p className="py-4 m-4 cursor-pointer" onClick={handleSignUp}>
+        <p className="py-4 m-4 cursor-pointer" onClick={toggleSignInForm}>
           {isSignIn
             ? "New to Netflix? Sign Up Now"
             : "Already a User? Sign In Now"}
