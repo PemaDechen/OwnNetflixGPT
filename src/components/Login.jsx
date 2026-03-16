@@ -3,15 +3,23 @@ import { Header } from "./Header";
 import { validate } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebaseconfig";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Login = () => {
   const [isSignInForm, setSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const email = useRef(null);
   const password = useRef(null);
+  const name = useRef(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const toggleSignInForm = () => {
     setSignIn(!isSignInForm);
   };
@@ -19,6 +27,7 @@ const Login = () => {
   const handleButtonClick = () => {
     const emailData = email?.current?.value;
     const passwordData = password?.current?.value;
+    const nameData = name?.current?.value;
     const isValid = validate(emailData, passwordData);
     setErrorMessage(isValid);
     if (!isValid) {
@@ -33,6 +42,26 @@ const Login = () => {
             // Signed in successfully
             const user = userCredential.user;
             console.log("User created and signed in:", user);
+            updateProfile(user, {
+              displayName: nameData,
+              photoURL:
+                "https://media.licdn.com/dms/image/v2/C5603AQFRphykhCbwoQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659598760774?e=1775088000&v=beta&t=YUqH5ohzkiIGsdAkQdXAk27lp6C-gHkoX-K9ZcTJcGk",
+            })
+              .then(() => {       
+                const { uid, email, displayName, photoURL } = auth?.currentUser;
+                dispatch(addUser({ uid, email, displayName, photoURL }));
+                navigate("/browse");
+                console.log("User profile updated successfully!");
+                console.log("New Display Name:", user.displayName);
+                console.log("New Photo URL:", user.photoURL);
+                // ...
+              })
+              .catch((error) => {
+                // An error occurred
+                console.error("Error updating user profile:", error);
+                // ...
+              });
+
             // You can now redirect the user or update the UI
           })
           .catch((error) => {
@@ -63,6 +92,9 @@ const Login = () => {
             // Signed in successfully
             const user = userCredential.user;
             console.log("User signed in:", user);
+            console.log("It is coming here???");
+            navigate("/browse");
+
             // You can access user information like:
             // console.log("User ID:", user.uid);
             // console.log("User Email:", user.email);
@@ -114,6 +146,7 @@ const Login = () => {
         </h1>
         {!isSignInForm && (
           <input
+            ref={name}
             type="text"
             placeholder="Full Name"
             className="m-4 p-4 w-full bg-gray-900 text-white"
