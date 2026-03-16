@@ -1,7 +1,30 @@
 import { Header } from "./Header";
-import React from "react";
-
+import React, { useEffect } from "react";
+import { API_OPTIONS } from "../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { addNowPlayingMovies } from "../utils/moviesSlice";
 const Browse = () => {
+  const dispatch = useDispatch();
+
+  const url = "https://api.themoviedb.org/3/movie/now_playing";
+
+  const movies = useSelector((store) => store.movies.nowPlayingMovies);
+
+  const getNowPlayingMovies = async () => {
+    const data = await fetch(url, API_OPTIONS);
+    const json = await data.json();
+    dispatch(addNowPlayingMovies(json.results));
+  };
+
+  useEffect(() => {
+    if (!movies) {
+      // ✅ only fetch if not already in store
+      getNowPlayingMovies();
+    }
+  }, []);
+
+  console.log("Movies in store:", movies); // ✅ what does this print?
+
   return (
     <div>
       <Header />

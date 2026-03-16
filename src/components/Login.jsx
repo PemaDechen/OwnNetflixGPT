@@ -7,9 +7,9 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebaseconfig";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { PHOTO_URL } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setSignIn] = useState(true);
@@ -17,7 +17,6 @@ const Login = () => {
   const email = useRef(null);
   const password = useRef(null);
   const name = useRef(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const toggleSignInForm = () => {
@@ -44,17 +43,11 @@ const Login = () => {
             console.log("User created and signed in:", user);
             updateProfile(user, {
               displayName: nameData,
-              photoURL:
-                "https://media.licdn.com/dms/image/v2/C5603AQFRphykhCbwoQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659598760774?e=1775088000&v=beta&t=YUqH5ohzkiIGsdAkQdXAk27lp6C-gHkoX-K9ZcTJcGk",
+              photoURL:PHOTO_URL
             })
-              .then(() => {       
+              .then(() => {
                 const { uid, email, displayName, photoURL } = auth?.currentUser;
                 dispatch(addUser({ uid, email, displayName, photoURL }));
-                navigate("/browse");
-                console.log("User profile updated successfully!");
-                console.log("New Display Name:", user.displayName);
-                console.log("New Photo URL:", user.photoURL);
-                // ...
               })
               .catch((error) => {
                 // An error occurred
@@ -86,14 +79,11 @@ const Login = () => {
             }
           });
       } else {
-        console.log("When SignIn form");
         signInWithEmailAndPassword(auth, emailData, passwordData)
           .then((userCredential) => {
             // Signed in successfully
-            const user = userCredential.user;
-            console.log("User signed in:", user);
-            console.log("It is coming here???");
-            navigate("/browse");
+            const { uid, email, displayName, photoURL } = userCredential.user;
+            dispatch(addUser({ uid, email, displayName, photoURL }));
 
             // You can access user information like:
             // console.log("User ID:", user.uid);
