@@ -31,7 +31,6 @@ const Login = () => {
     setErrorMessage(isValid);
     if (!isValid) {
       if (!isSignInForm) {
-        console.log("When SignUp form");
         createUserWithEmailAndPassword(
           auth,
           email?.current?.value,
@@ -40,7 +39,6 @@ const Login = () => {
           .then((userCredential) => {
             // Signed in successfully
             const user = userCredential.user;
-            console.log("User created and signed in:", user);
             updateProfile(user, {
               displayName: nameData,
               photoURL:PHOTO_URL
@@ -84,11 +82,6 @@ const Login = () => {
             // Signed in successfully
             const { uid, email, displayName, photoURL } = userCredential.user;
             dispatch(addUser({ uid, email, displayName, photoURL }));
-
-            // You can access user information like:
-            // console.log("User ID:", user.uid);
-            // console.log("User Email:", user.email);
-            // ... further actions like redirecting to a dashboard
           })
           .catch((error) => {
             const errorCode = error.code;

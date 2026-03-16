@@ -10,7 +10,6 @@ export const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
-  console.log("This is user");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

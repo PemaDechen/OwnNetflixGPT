@@ -9,6 +9,4 @@ const appStore = configureStore({
    },
 });
 
-console.log('This is movieReducer', movieReducer);
-
 export default appStore;
