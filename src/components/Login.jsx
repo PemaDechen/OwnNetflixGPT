@@ -1,20 +1,99 @@
 import React, { useRef, useState } from "react";
 import { Header } from "./Header";
 import { validate } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "firebase/auth";
+import { auth } from "../utils/firebaseconfig";
 
 const Login = () => {
-  const [isSignIn, setSignIn] = useState(true);
+  const [isSignInForm, setSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const email = useRef(null);
   const password = useRef(null);
   const toggleSignInForm = () => {
-    setSignIn(!isSignIn);
+    setSignIn(!isSignInForm);
   };
 
-  const handleSignIn = () => {
-    console.log(password?.current?.value)
-    const isValid = validate(email?.current?.value, password?.current?.value);
+  const handleButtonClick = () => {
+    const emailData = email?.current?.value;
+    const passwordData = password?.current?.value;
+    const isValid = validate(emailData, passwordData);
     setErrorMessage(isValid);
+    if (!isValid) {
+      if (!isSignInForm) {
+        console.log("When SignUp form");
+        createUserWithEmailAndPassword(
+          auth,
+          email?.current?.value,
+          password?.current?.value,
+        )
+          .then((userCredential) => {
+            // Signed in successfully
+            const user = userCredential.user;
+            console.log("User created and signed in:", user);
+            // You can now redirect the user or update the UI
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error("Error creating user:", errorCode, errorMessage);
+            setErrorMessage(errorCode + "-" + errorMessage);
+
+            // Handle specific error codes
+            if (errorCode === "auth/email-already-in-use") {
+              alert("The email address is already in use by another account.");
+            } else if (errorCode === "auth/invalid-email") {
+              alert("The email address is not valid.");
+            } else if (errorCode === "auth/weak-password") {
+              alert(
+                "The password is too weak. Please choose a stronger password.",
+              );
+            } else if (errorCode === "auth/operation-not-allowed") {
+              alert(
+                "Email/Password sign-in is not enabled. Please enable it in the Firebase console.",
+              );
+            }
+          });
+      } else {
+        console.log("When SignIn form");
+        signInWithEmailAndPassword(auth, emailData, passwordData)
+          .then((userCredential) => {
+            // Signed in successfully
+            const user = userCredential.user;
+            console.log("User signed in:", user);
+            // You can access user information like:
+            // console.log("User ID:", user.uid);
+            // console.log("User Email:", user.email);
+            // ... further actions like redirecting to a dashboard
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error("Error signing in:", errorCode, errorMessage);
+
+            // Handle specific error codes
+            switch (errorCode) {
+              case "auth/invalid-email":
+                console.error("The email address is not valid.");
+                break;
+              case "auth/user-disabled":
+                console.error("This user account has been disabled.");
+                break;
+              case "auth/user-not-found":
+                console.error("No user found with this email.");
+                break;
+              case "auth/wrong-password":
+                console.error("Incorrect password.");
+                break;
+              // Add more specific error handling as needed
+              default:
+                console.error("An unknown error occurred.");
+            }
+          });
+      }
+    }
   };
   return (
     <div>
@@ -24,16 +103,16 @@ const Login = () => {
           alt="bg-img"
         />
       </div>
-
       <Header />
+
       <form
         onSubmit={(e) => e.preventDefault()}
         className="w-3/12 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white opacity-90"
       >
         <h1 className="font-bold text-3xl py-4">
-          {isSignIn ? "Sign In" : "Sign Up"}
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </h1>
-        {!isSignIn && (
+        {!isSignInForm && (
           <input
             type="text"
             placeholder="Full Name"
@@ -56,13 +135,13 @@ const Login = () => {
           <p className="text-red-500 text-lg font-bold pl-4">{errorMessage}</p>
         )}
         <button
-          className="m-4 p-4 bg-red-700 w-full rounded-lg cursor-pointer"
-          onClick={handleSignIn}
+          className="m-4 p-4 bg-red-700 w-full rounded-lg"
+          onClick={handleButtonClick}
         >
-          {isSignIn ? "Sign In" : "Sign Up"}
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
         <p className="py-4 m-4 cursor-pointer" onClick={toggleSignInForm}>
-          {isSignIn
+          {isSignInForm
             ? "New to Netflix? Sign Up Now"
             : "Already a User? Sign In Now"}
         </p>
