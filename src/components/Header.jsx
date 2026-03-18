@@ -10,10 +10,9 @@ export const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user && auth?.currentUser) {
         const { uid, email, displayName, photoURL } = user;
         dispatch(
           addUser({
@@ -36,14 +35,17 @@ export const Header = () => {
 
   const handleSignOut = () => {
     signOut(auth)
-      .then(() => {})
+      .then(() => {
+        console.log("signout success");
+      })
       .catch((error) => {
         console.error("Error signing out:", error);
       });
   };
   return (
-    <div className="absolute w-screen px-8 py-2 bg-linear-to-b from-black flex justify-between">
+    <div className="absolute w-screen px-8 py-2 bg-linear-to-b from-black flex justify-between z-50">
       <img className="w-52" src={LOGO_URL} alt="netflix-logo" />
+
       {user && (
         <div className="flex p-2">
           <img className="w-12 h-12 " src={user?.photoURL} alt="photo-icon" />
