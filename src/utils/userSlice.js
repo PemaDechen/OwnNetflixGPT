@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { SUPPORTED_LANGUAGES } from "./constants";
 
 const userSlice = createSlice({
   name: "user",
